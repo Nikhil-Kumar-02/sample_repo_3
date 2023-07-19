@@ -6,6 +6,9 @@ class BookingRepository{
     async create (data){
         try {
             const ticket = await Booking.create(data);
+            // while booking we have to take care that left seats is more than the required seats 
+            // and after booking the number of seats should reduce
+            //and user has reached here then he must have been authenticated
             return ticket;
         } catch (error) {
             if(error.name == 'SequelizeValidationError'){
@@ -17,6 +20,17 @@ class BookingRepository{
                 'there was some issue creating the booking, please try again later',
                 StatusCodes.INTERNAL_SERVER_ERROR
             );
+        }
+    }
+
+    //we know if a customer with a booked ticket want to change the flight from a to  b due to 
+    //time or some other reason then if possible with some money then their flight are changed 
+    //only if seats are available
+    async update(){
+        try {
+            
+        } catch (error) {
+            
         }
     }
 
