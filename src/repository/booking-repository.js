@@ -1,3 +1,4 @@
+const booking = require('../models/booking');
 const { Booking } = require('../models/index');
 const { ValidationError , AppError } = require('../utils/errror/index');
 const { StatusCodes } = require('http-status-codes');
@@ -26,11 +27,21 @@ class BookingRepository{
     //we know if a customer with a booked ticket want to change the flight from a to  b due to 
     //time or some other reason then if possible with some money then their flight are changed 
     //only if seats are available
-    async update(){
+    async update(bookingId , data){
         try {
-            
+            const reqTicket = await Booking.findByPk(bookingId);
+            if(data.status)
+                reqTicket.status = data.status;
+
+            await reqTicket.save();
+            return reqTicket;
         } catch (error) {
-            
+            throw new AppError(
+                'repository error',
+                'cannot update  booking',
+                'there was some issue updating the booking, please try again later',
+                StatusCodes.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
