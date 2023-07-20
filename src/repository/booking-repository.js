@@ -45,6 +45,41 @@ class BookingRepository{
         }
     }
 
+    //for deleting a ticket we will need the ticket id 
+    //from ticket id we will first need to fetch the ticket details like seats and flightid
+    //then we will update the seats count and then delete the ticket entry from the database
+    async getTicketDetails(ticketId){
+        try {
+            const ticketDetails = await Booking.findByPk(ticketId);
+            return ticketDetails;
+        } catch (error) {
+            throw new AppError(
+                'repository error',
+                'cannot fetech the booking details',
+                'there was some issue fetching the ticket details, please try again later',
+                StatusCodes.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    async cancelTicket(ticketId){
+        try {
+            await Booking.destroy({
+                where : {
+                    id : ticketId
+                }
+            });
+            return true;
+        } catch (error) {
+            throw new AppError(
+                'repository error',
+                'cannot cancel the ticket',
+                'there was some issue cancelling the ticket details, please try again later',
+                StatusCodes.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 }
 
 module.exports = BookingRepository;

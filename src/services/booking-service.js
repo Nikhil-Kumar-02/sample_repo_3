@@ -69,6 +69,41 @@ class BookingService{
     //similarly i can write the logic for updating the flight with boarding or destination
     //or a logic for cancelltion of the flight
 
+
+    async cancelBooking(id){
+        try {
+            //step 1 -  gather all information about the ticket from the ticket_id
+            const ticketDetails = await this.bookingRepository.getTicketDetails(id);
+            console.log('ticket details ', ticketDetails);
+            //step 2 -  now go to that flight and undo the number of seats resserved by this ticket
+            let GetFlightRequestURL = `${FLIGHT_SERVICE}/flight/${ticketDetails.flightId}`;
+            const response = await axios.get(GetFlightRequestURL);
+            const flightData = response.data.data;
+            console.log('the data of the flight, the ticket has to be cancelled' , flightData);
+
+            
+            const refund = ticketDetails.TotalCost/2;
+            ticketDetails.dataValues.refund = refund;
+            
+            const UpdateSeatsURL = `${FLIGHT_SERVICE}/flight/${flightData.flightNumber}`;
+            //now i will make request to update the seats explicitily
+            const UpdatedFlightDetails = await axios.patch(UpdateSeatsURL ,
+                {totalSeats : flightData.totalSeats + ticketDetails.noOfSeats});
+
+            //now after we have updated the seat count from the flight we can delete the ticket from db
+            //step 3 -  delete the ticket from the db
+            const deletingProcess = await this.bookingRepository.cancelTicket(id);
+            ticketDetails.dataValues.status = 'deleted';
+            console.log('the reponse ' , ticketDetails);
+            return ticketDetails;
+        } catch (error) {
+            if(error.name == 'repository error'){
+                throw error;
+            }
+            throw new ServiceError();
+        }
+    }
+
 }
 
 module.exports = BookingService;
