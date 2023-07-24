@@ -10,7 +10,7 @@ const startServer = async ()=>{
     app.use(bodyParser.json());
 
     app.use(bodyParser.urlencoded({extended : true}));
-    app.use('/api' , apiRoutes);
+    app.use('/booking/api' , apiRoutes);
     app.listen(PORT , async ()=> {
         console.log(`server is running on port : ${PORT}`);
         if(DB_SYNC){
